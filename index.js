@@ -41,6 +41,11 @@ const cliProgress = require('cli-progress');
       type: 'string',
       description: 'Specify clone method (default is http)'
     })
+    .option('archived', {
+      alias: 'a',
+      type: 'boolean',
+      description: 'Backup only archived projects'
+    })
     .help(true)
     .argv
 
@@ -73,7 +78,7 @@ const cliProgress = require('cli-progress');
   }
 
   const personalProjects = await rp.get(
-    `${baseUrl}/api/v4/users/${user.id}/projects`,
+    `${baseUrl}/api/v4/users/${user.id}/projects?${argv.archived ? 'archived=true' : ''}`,
     requestOptions
   )
   if (argv.verbose) {
@@ -100,7 +105,7 @@ const cliProgress = require('cli-progress');
   const gids = _.map(groups, 'id')
   for (let gid of gids) {
     let projects = await rp.get(
-      `${baseUrl}/api/v4/groups/${gid}/projects?per_page=999`,
+      `${baseUrl}/api/v4/groups/${gid}/projects?per_page=999${argv.archived ? '&archived=true' : ''}`,
       requestOptions
     )
     let ps = _.map(projects, method)
